@@ -38,7 +38,7 @@ items:
             schedulerName: default-scheduler
             securityContext: {}
             terminationGracePeriodSeconds: 30
-    schedule: 0 0 2 * *
+    schedule: {{ .Values.sftp.schedule }}
     successfulJobsHistoryLimit: 3
     suspend: false
   status: {}

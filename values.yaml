@@ -32,6 +32,7 @@ environment:
 
 sftp:
   bucketName: carwiz_jato # Files will be downloaded from this bucket
+  schedule: 0 0 2 * * # Cronjob schedule time - Once every month on its second day
   volumes:
     gcsCredentials: sftp-bucket-credentials 
 
