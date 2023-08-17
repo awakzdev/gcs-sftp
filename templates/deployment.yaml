@@ -48,7 +48,7 @@ spec:
       volumes:
       - name: gcp-serviceaccount-credentials
         secret:
-          secretName: {{ .Values.sftp.volumes.gcsCredentials }}
+          secretName: {{ .Values.volumes.gcsCredentials }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

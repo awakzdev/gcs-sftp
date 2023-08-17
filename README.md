@@ -75,12 +75,15 @@ stringData:
 ```
 Reference it in your `values.yaml`:
 ```yaml
-sftp:
-  bucketName: your_bucket_name # Files will be downloaded from this bucket
-  volumes:
-    gcsCredentials: sftp-bucket-credentials
+volumes:
+  gcsCredentials: sftp-bucket-credentials
 ```
-
+Additional configuration regarding your bucket/CRONJOB schedule should be adjusted
+```yaml
+sftp:
+  schedule: 0 0 2 * * # CRONJOB Schedule - Once every month on its second day
+  bucketName: carwiz_jato # Files will be downloaded from this bucket
+```
 ## Connection Details
 To connect to the SFTP server, use the credentials specified in the [`combinedcreds`](#sftp-users-secret) secret. Here's a breakdown:
 

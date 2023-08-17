@@ -30,11 +30,12 @@ environment:
 #       ...
 #     }
 
+volumes:
+  gcsCredentials: sftp-bucket-credentials 
+
 sftp:
   schedule: 0 0 2 * * # CRONJOB Schedule - Once every month on its second day 
   bucketName: carwiz_jato # Files will be downloaded from this bucket
-  volumes:
-    gcsCredentials: sftp-bucket-credentials 
 
 replicaCount: 1
 
