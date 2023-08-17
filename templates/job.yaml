@@ -1,0 +1,30 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: sftp-bucket-sync-prerequisites
+spec:
+  template:
+    metadata:
+      creationTimestamp: null
+    spec:
+      containers:
+      - command:
+        - /bin/bash
+        - -c
+        - |
+          POD_NAME=$(kubectl get pods --namespace {{ .Release.Namespace }} --no-headers -o custom-columns=":metadata.name" | grep '^{{ .Chart.Name }}-' | head -n 1)
+          kubectl exec $POD_NAME --namespace {{ .Release.Namespace }} -- /bin/bash -c '
+
+            # Download CURL && Python.
+            apt-get update && apt-get install -y python3 curl && apt-get clean
+
+            # Install Google Cloud SDK
+            curl https://sdk.cloud.google.com | bash -s -- --disable-prompts
+
+            # Setup environment for SDK
+            echo "export PATH=$PATH:/root/google-cloud-sdk/bin" >> ~/.bashrc
+          '
+        image: google/cloud-sdk:latest
+        imagePullPolicy: Always
+        name: sftp-bucket-sync-prerequisites
+      restartPolicy: OnFailure

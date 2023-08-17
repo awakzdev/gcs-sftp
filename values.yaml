@@ -1,0 +1,68 @@
+# You'll have to define a username and password in a combined format
+# This snippet may be used 
+# apiVersion: v1
+# kind: Secret
+# metadata:
+#   name: sftp-secret
+# type: Opaque
+# stringData:
+#   combinedcreds: username:password
+
+environment:
+  SFTP_USERS:
+    secretKeyRef:
+      name: sftp-secret
+      key: combinedcreds
+
+# A secret containing GCP serviceaccount with GCS permission in JSON format.
+# The following will attach the credentials as a volume to be used for authentication.
+# This snippet may be used 
+# apiVersion: v1
+# kind: Secret
+# metadata:
+#   name: sftp-bucket-credentials
+# type: Opaque
+# stringData:
+#   credentials.json: |
+#     {
+#       "type": "service_account",
+#       "project_id": "carwiz-97e29",
+#       ...
+#     }
+
+sftp:
+  bucketName: carwiz_jato # Files will be downloaded from this bucket
+  volumes:
+    gcsCredentials: sftp-bucket-credentials 
+
+replicaCount: 1
+
+image:
+  repository: atmoz/sftp
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+serviceAccount:
+  create: false
+
+service:
+  type: LoadBalancer
+  port: 22
+
+ingress:
+  enabled: false
+
+resources: 
+  limits:
+    # cpu: 100m
+    memory: 500Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+autoscaling:
+  enabled: false
+
+nodeSelector: 
+  workload: application
+
