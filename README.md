@@ -17,20 +17,6 @@ This repository provides a Helm chart for deploying an SFTP server that synchron
 2. Helm v3 or newer installed.
 3. Google Cloud Service Account with permissions to access the desired GCS bucket.
 
-## Quick Start
-1. Clone the repository:
-```
-git clone https://github.com/awakzdev/gcs-sftp
-cd gcs-sftp
-```
-2. Configure your values: Modify `values.yaml` to point to your Google Cloud Storage bucket and provide credentials for your Google Cloud Service Account.
-
-3. Install the Helm chart:
-```
-helm upgrade --install sftp-server . -f values.yaml --namespace sftp --create-namespace
-```
-After a few moments, your SFTP server should be up and running. It will periodically synchronize with the specified Google Cloud Storage bucket.
-
 ## Configuration
 To correctly deploy this Helm chart, you need to adjust the values.yaml and provide specific Kubernetes secrets.
 
@@ -84,6 +70,11 @@ sftp:
   schedule: 0 0 2 * * # CRONJOB Schedule - Once every month on its second day
   bucketName: carwiz_jato # Files will be downloaded from this bucket
 ```
+Install the Helm chart:
+```
+helm upgrade --install sftp-server . -f values.yaml --namespace sftp --create-namespace
+```
+After a few moments, your SFTP server should be up and running. It will periodically synchronize with the specified Google Cloud Storage bucket.
 ## Connection Details
 To connect to the SFTP server, use the credentials specified in the [`combinedcreds`](#sftp-users-secret) secret. Here's a breakdown:
 
