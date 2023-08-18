@@ -24,7 +24,6 @@ items:
                 kubectl exec $POD_NAME --namespace {{ .Release.Namespace }} -- /bin/bash -c '
 
                   # Authenticate && Synchronize GCS files
-                  export PATH=$PATH:/root/google-cloud-sdk/bin
                   gcloud auth activate-service-account --key-file /etc/gcp/*.json
                   gsutil -m rsync -r gs://{{ .Values.sftp.bucketName }} /home/*/
                 '

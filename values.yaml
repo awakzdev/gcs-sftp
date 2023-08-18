@@ -40,7 +40,7 @@ sftp:
 replicaCount: 1
 
 image:
-  repository: atmoz/sftp
+  repository: awakz/sftp-gcloud
   pullPolicy: IfNotPresent
   tag: "latest"
 
