@@ -23,7 +23,7 @@ spec:
                 {{- if not .Values.workloadIdentity }}
                 gcloud auth activate-service-account --key-file /etc/gcp/*.json
                 {{- end }}
-                gsutil -m rsync -r gs://{{ .Values.sftp.bucketName }} /home/*/
+                gsutil -m rsync -r gs://{{ .Values.sftp.bucketName }} /home/${SFTP_USERS%%:*}/
             image: {{ .Values.cronjob.image.repository }}:{{ .Values.cronjob.image.tag }}
             imagePullPolicy: {{ .Values.cronjob.image.pullPolicy }}
             name: {{ include "sftp.fullname" . }}-bucket-sync
