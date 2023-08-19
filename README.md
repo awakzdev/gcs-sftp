@@ -54,7 +54,6 @@ gcloud iam service-accounts add-iam-policy-binding \
 ### SFTP Users Secret
 Define a username and password in a combined format for your SFTP access:
 ```yaml
-# Example snippet for creating the secret
 apiVersion: v1
 kind: Secret
 metadata:
@@ -76,7 +75,6 @@ environment:
 ### Google Cloud Service Account Secret
 Create a secret containing the Google Cloud Service Account in JSON format with GCS permissions:
 ```yaml
-# Example snippet for creating the secret
 apiVersion: v1
 kind: Secret
 metadata:
