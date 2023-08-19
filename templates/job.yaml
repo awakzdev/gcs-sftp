@@ -13,22 +13,17 @@ spec:
         - /bin/bash
         - -c
         - |
-            # Authenticate && Synchronize GCS files
+            # Authenticate && Synchronize
             {{- if not .Values.workloadIdentity }}
             gcloud auth activate-service-account --key-file /etc/gcp/*.json
             {{- end }}
 
-            # Find username home folder 
-            for dir in /home/*/
-            do
-                if [ -d "$dir" ]; then
-                    gsutil -m rsync -r gs://{{ .Values.sftp.bucketName }} "$dir"
-                fi
-            done
-
+            gsutil -m rsync -r gs://{{ .Values.sftp.bucketName }} /home/${SFTP_USERS%%:*}/
         image: {{ .Values.cronjob.image.repository }}:{{ .Values.cronjob.image.tag }}
         imagePullPolicy: {{ .Values.cronjob.image.pullPolicy }}
         name: {{ include "sftp.fullname" . }}-bucket-sync
+        env:
+          {{- include "sftp.environments" . | nindent 12 }}
         resources: {}
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File
