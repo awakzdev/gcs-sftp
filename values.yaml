@@ -33,21 +33,21 @@ environment:
 volumes:
   storage: 5Gi
   storageClassName: standard
-  gcsCredentials: sftp-bucket-credentials # Has to be set incase workloadIdentity: false
+  gcsCredentials: sftp-bucket-credentials # Optional - Has to be set incase workloadIdentity: false
 
-workloadIdentity: false # Please annotate the serviceAccount section incase this is set to `true`
+workloadIdentity: enabled # Please annotate the serviceAccount section incase this is set to `true`
 
 # To set up Workload Identity, ensure you bind the KSA to the GSA with:
 # gcloud iam service-accounts add-iam-policy-binding \
+  # <GSA_NAME>@<PROJECT_ID>.iam.gserviceaccount.com
   # --role roles/iam.workloadIdentityUser \
   # --member "serviceAccount:<PROJECT_ID>.svc.id.goog[<NAMESPACE>/<KSA_NAME>]" \
-  # <GSA_NAME>@<PROJECT_ID>.iam.gserviceaccount.com
-
+  
 serviceAccount:
   create: true
-  annotations: {}
-  # Incase workloadIdentity was set to true
-  # iam.gke.io/gcp-service-account: <GSA_NAME>@<PROJECT_ID>.iam.gserviceaccount.com
+  annotations: 
+    # Incase workloadIdentity was set to true
+    iam.gke.io/gcp-service-account: <KSA_NAME>@<PROJECT_ID>.iam.gserviceaccount.com
   name: ""
 
 sftp:

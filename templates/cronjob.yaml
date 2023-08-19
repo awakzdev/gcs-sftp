@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: {{ include "sftp.fullname" . }}-bucket-sync-cronjob
+  name: {{ include "sftp.fullname" . }}-sftp-bucket-sync-cronjob
 spec:
   concurrencyPolicy: {{ .Values.cronjob.concurrentPolicy }} 
   failedJobsHistoryLimit: 1
@@ -13,24 +13,40 @@ spec:
         metadata:
           creationTimestamp: null
         spec:
+          serviceAccountName: {{ include "sftp.serviceAccountName" . }}
           containers:
           - command:
             - /bin/bash
             - -c
             - |
-              POD_NAME=$(kubectl get pods --namespace {{ .Release.Namespace }} --no-headers -o custom-columns=":metadata.name" | grep '^{{ .Chart.Name }}-' | head -n 1)
-              kubectl exec $POD_NAME --namespace {{ .Release.Namespace }} -- /bin/bash -c '
-
                 # Authenticate && Synchronize GCS files
+                {{- if not .Values.workloadIdentity }}
                 gcloud auth activate-service-account --key-file /etc/gcp/*.json
+                {{- end }}
                 gsutil -m rsync -r gs://{{ .Values.sftp.bucketName }} /home/*/
-              '
             image: {{ .Values.cronjob.image.repository }}:{{ .Values.cronjob.image.tag }}
             imagePullPolicy: {{ .Values.cronjob.image.pullPolicy }}
             name: {{ include "sftp.fullname" . }}-bucket-sync
             resources: {}
             terminationMessagePath: /dev/termination-log
             terminationMessagePolicy: File
+            volumeMounts:
+            {{- if not .Values.workloadIdentity }}
+            - name: gcp-serviceaccount-credentials
+              mountPath: /etc/gcp
+              readOnly: true
+              {{- end }}
+            - name: sftp-data
+              mountPath: /home
+          volumes:
+          {{- if not .Values.workloadIdentity }}
+          - name: gcp-serviceaccount-credentials
+            secret:
+              secretName: {{ .Values.volumes.gcsCredentials }}
+            {{- end }}
+          - name: sftp-data
+            persistentVolumeClaim:
+              claimName: sftp-pvc
           dnsPolicy: ClusterFirst
           restartPolicy: OnFailure
           schedulerName: default-scheduler

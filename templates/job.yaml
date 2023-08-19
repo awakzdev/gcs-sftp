@@ -1,0 +1,57 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "sftp.fullname" . }}-initial-sftp-bucket-sync-job
+spec:
+  template:
+    metadata:
+      creationTimestamp: null
+    spec:
+      serviceAccountName: {{ include "sftp.serviceAccountName" . }}
+      containers:
+      - command:
+        - /bin/bash
+        - -c
+        - |
+            # Authenticate && Synchronize GCS files
+            {{- if not .Values.workloadIdentity }}
+            gcloud auth activate-service-account --key-file /etc/gcp/*.json
+            {{- end }}
+
+            # Find username home folder 
+            for dir in /home/*/
+            do
+                if [ -d "$dir" ]; then
+                    gsutil -m rsync -r gs://{{ .Values.sftp.bucketName }} "$dir"
+                fi
+            done
+
+        image: {{ .Values.cronjob.image.repository }}:{{ .Values.cronjob.image.tag }}
+        imagePullPolicy: {{ .Values.cronjob.image.pullPolicy }}
+        name: {{ include "sftp.fullname" . }}-bucket-sync
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        {{- if not .Values.workloadIdentity }}
+        - name: gcp-serviceaccount-credentials
+          mountPath: /etc/gcp
+          readOnly: true
+          {{- end }}
+        - name: sftp-data
+          mountPath: /home
+      volumes:
+      {{- if not .Values.workloadIdentity }}
+      - name: gcp-serviceaccount-credentials
+        secret:
+          secretName: {{ .Values.volumes.gcsCredentials }}
+        {{- end }}
+      - name: sftp-data
+        persistentVolumeClaim:
+          claimName: sftp-pvc
+      dnsPolicy: ClusterFirst
+      restartPolicy: OnFailure
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+  backoffLimit: 4

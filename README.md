@@ -3,6 +3,7 @@ This repository provides a Helm chart for deploying an SFTP server that synchron
 
 ## Table of Contents
 - [Configuration](#configuration)
+    - [Workload-Identity](#workload-identity)
     - [SFTP Users Secret](#sftp-users-secret)
     - [GCS Service Account Secret](#google-cloud-service-account-secret)
 - [Connection Details](#connection-details)
@@ -19,6 +20,42 @@ This repository provides a Helm chart for deploying an SFTP server that synchron
 
 ## Configuration
 To correctly deploy this Helm chart, you need to adjust the values.yaml and provide specific Kubernetes secrets.
+
+### Workload Identity
+If you're using Google Kubernetes Engine (GKE), Workload Identity allows your Kubernetes Service Account (KSA) to act as a Google Service Account (GSA). This avoids the need to manage secrets manually.
+
+- Set `workloadIdentity` to `enabled` if you want to use Workload Identity.
+
+  ```yaml
+  workloadIdentity: enabled
+
+- Configure the serviceAccount section:
+```yaml
+serviceAccount:
+  create: true
+  annotations: 
+    iam.gke.io/gcp-service-account: <GSA_NAME>@<PROJECT_ID>.iam.gserviceaccount.com
+  name: ""
+```
+- Make sure `gcsCredentials` is set correctly. This is optional and is used when workloadIdentity is set to false.
+```yaml
+volumes:
+  gcsCredentials: sftp-bucket-credentials
+```
+
+**Setting up Workload Identity:** 
+1. Make sure Workload Identity is enabled on your GKE cluster.
+2. Create the Google Service Account if it does not exist.
+3. Bind the KSA to the GSA:
+```yaml
+gcloud iam service-accounts add-iam-policy-binding \
+  <GSA_NAME>@<PROJECT_ID>.iam.gserviceaccount.com \
+  --role roles/iam.workloadIdentityUser \
+  --member "serviceAccount:<PROJECT_ID>.svc.id.goog[<NAMESPACE>/<KSA_NAME>]"
+```
+Remember to replace placeholders (<..>) with actual values.
+
+4. Deploy your application. The Kubernetes Service Account used by your application will now act as the specified Google Service Account.
 
 ### SFTP Users Secret
 Define a username and password in a combined format for your SFTP access:
