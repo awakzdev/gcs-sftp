@@ -10,6 +10,6 @@ spec:
     - port: {{ .Values.service.port }}
       targetPort: 22
       protocol: TCP
-      name: http
+      name: sftp
   selector:
     {{- include "sftp.selectorLabels" . | nindent 4 }}

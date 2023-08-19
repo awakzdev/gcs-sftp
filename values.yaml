@@ -31,40 +31,55 @@ environment:
 #     }
 
 volumes:
-  gcsCredentials: sftp-bucket-credentials 
+  storage: 5Gi
+  storageClassName: standard
+  gcsCredentials: sftp-bucket-credentials # Has to be set incase workloadIdentity: false
+
+workloadIdentity: false # Please annotate the serviceAccount section incase this is set to `true`
+
+# To set up Workload Identity, ensure you bind the KSA to the GSA with:
+# gcloud iam service-accounts add-iam-policy-binding \
+  # --role roles/iam.workloadIdentityUser \
+  # --member "serviceAccount:<PROJECT_ID>.svc.id.goog[<NAMESPACE>/<KSA_NAME>]" \
+  # <GSA_NAME>@<PROJECT_ID>.iam.gserviceaccount.com
+
+serviceAccount:
+  create: true
+  annotations: {}
+  # Incase workloadIdentity was set to true
+  # iam.gke.io/gcp-service-account: <GSA_NAME>@<PROJECT_ID>.iam.gserviceaccount.com
+  name: ""
 
 sftp:
   schedule: 0 0 2 * * # CRONJOB Schedule - Once every month on its second day 
   bucketName: carwiz_jato # Files will be downloaded from this bucket
 
-replicaCount: 1
+cronjob:
+  image:
+    repository: google/cloud-sdk
+    tag: latest
+    pullPolicy: Always
+  schedule: "0 0 * * *"
+  concurrentPolicy: Forbid # Allow / Forbid / Replace
 
 image:
   repository: awakz/sftp-gcloud
   pullPolicy: IfNotPresent
   tag: "latest"
 
-serviceAccount:
-  create: false
+replicaCount: 1
 
 service:
   type: LoadBalancer
   port: 22
 
-ingress:
-  enabled: false
+resources: {}
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
 
-resources: 
-  limits:
-    # cpu: 100m
-    memory: 500Mi
-  requests:
-    cpu: 100m
-    memory: 128Mi
-
-autoscaling:
-  enabled: false
-
-nodeSelector: 
-  workload: application
+nodeSelector: {}
 

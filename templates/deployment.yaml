@@ -5,9 +5,7 @@ metadata:
   labels:
     {{- include "sftp.labels" . | nindent 4 }}
 spec:
-  {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
-  {{- end }}
   selector:
     matchLabels:
       {{- include "sftp.selectorLabels" . | nindent 6 }}
@@ -34,7 +32,7 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
-            - name: http
+            - name: sftp
               containerPort: {{ .Values.service.port }}
               protocol: TCP
           env:
@@ -42,13 +40,22 @@ spec:
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
+          {{- if not .Values.workloadIdentity }}
           - name: gcp-serviceaccount-credentials
             mountPath: /etc/gcp
             readOnly: true
+            {{- end }}
+          - name: sftp-data
+            mountPath: /home
       volumes:
+      {{- if not .Values.workloadIdentity }}
       - name: gcp-serviceaccount-credentials
         secret:
           secretName: {{ .Values.volumes.gcsCredentials }}
+        {{- end }}
+      - name: sftp-data
+        persistentVolumeClaim:
+          claimName: sftp-pvc
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
