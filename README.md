@@ -72,7 +72,16 @@ environment:
       name: sftp-secret
       key: combinedcreds
 ```
+Additional configuration regarding your bucket/CRONJOB schedule should be adjusted
+```yaml
+sftp:
+  schedule: 0 0 2 * * # CRONJOB Schedule - Once every month on its second day
+  bucketName: carwiz_jato # Files will be downloaded from this bucket
+```
 ### Google Cloud Service Account Secret
+**Optional - Incase Workload-Identity was configured this step can be skipped**
+<hr>
+
 Create a secret containing the Google Cloud Service Account in JSON format with GCS permissions:
 ```yaml
 apiVersion: v1
@@ -93,13 +102,8 @@ Reference it in your `values.yaml`:
 volumes:
   gcsCredentials: sftp-bucket-credentials
 ```
-Additional configuration regarding your bucket/CRONJOB schedule should be adjusted
-```yaml
-sftp:
-  schedule: 0 0 2 * * # CRONJOB Schedule - Once every month on its second day
-  bucketName: carwiz_jato # Files will be downloaded from this bucket
-```
-Install the Helm chart:
+### Installation
+Deploy the Helm chart:
 ```
 helm upgrade --install sftp-server . -f values.yaml --namespace sftp --create-namespace
 ```
