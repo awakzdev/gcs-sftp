@@ -3,8 +3,8 @@ This repository provides a Helm chart for deploying an SFTP server that synchron
 
 ## Table of Contents
 - [Configuration](#configuration)
-    - [Workload-Identity](#workload-identity)
     - [SFTP Users Secret](#sftp-users-secret)
+    - [Workload-Identity](#workload-identity)
     - [GCS Service Account Secret](#google-cloud-service-account-secret)
 - [Connection Details](#connection-details)
 
@@ -21,6 +21,33 @@ This repository provides a Helm chart for deploying an SFTP server that synchron
 ## Configuration
 To correctly deploy this Helm chart, you need to adjust the values.yaml and provide specific Kubernetes secrets.
 
+### SFTP Users Secret
+Define a username and password in a combined format for your SFTP access:
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: sftp-secret
+type: Opaque
+stringData:
+  combinedcreds: username:password
+```
+**The combinedcreds value in the format username:password will be used as the SFTP credentials. When connecting to the SFTP server, you will use this username and password to authenticate on port 22.**
+
+Then, in your `values.yaml`:
+```yaml
+environment:
+  SFTP_USERS:
+    secretKeyRef:
+      name: sftp-secret
+      key: combinedcreds
+```
+Additional configuration regarding your bucket/CRONJOB schedule should be adjusted
+```yaml
+sftp:
+  schedule: 0 0 2 * * # CRONJOB Schedule - Once every month on its second day
+  bucketName: carwiz_jato # Files will be downloaded from this bucket
+```
 ### Workload Identity
 If you're using Google Kubernetes Engine (GKE), Workload Identity allows your Kubernetes Service Account (KSA) to act as a Google Service Account (GSA). This avoids the need to manage secrets manually.
 
@@ -50,37 +77,8 @@ gcloud iam service-accounts add-iam-policy-binding \
 **Remember to replace placeholders (<..>) with actual values.**
 
 4. Deploy your application. The Kubernetes Service Account used by your application will now act as the specified Google Service Account.
-
-### SFTP Users Secret
-Define a username and password in a combined format for your SFTP access:
-```yaml
-apiVersion: v1
-kind: Secret
-metadata:
-  name: sftp-secret
-type: Opaque
-stringData:
-  combinedcreds: username:password
-```
-**The combinedcreds value in the format username:password will be used as the SFTP credentials. When connecting to the SFTP server, you will use this username and password to authenticate on port 22.**
-
-Then, in your `values.yaml`:
-```yaml
-environment:
-  SFTP_USERS:
-    secretKeyRef:
-      name: sftp-secret
-      key: combinedcreds
-```
-Additional configuration regarding your bucket/CRONJOB schedule should be adjusted
-```yaml
-sftp:
-  schedule: 0 0 2 * * # CRONJOB Schedule - Once every month on its second day
-  bucketName: carwiz_jato # Files will be downloaded from this bucket
-```
 ### Google Cloud Service Account Secret
 **Optional - Incase Workload-Identity was configured this step can be skipped**
-<hr>
 
 Create a secret containing the Google Cloud Service Account in JSON format with GCS permissions:
 ```yaml
