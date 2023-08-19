@@ -90,8 +90,11 @@ stringData:
 ```
 Reference it in your `values.yaml`:
 ```yaml
-volumes:
-  gcsCredentials: sftp-bucket-credentials
+environment:
+  GCS_CREDENTIALS:
+    secretKeyRef:
+      name: sftp-bucket-credentials
+      key: credentials.json
 ```
 Additional configuration regarding your bucket/CRONJOB schedule should be adjusted
 ```yaml

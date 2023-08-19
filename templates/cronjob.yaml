@@ -33,19 +33,9 @@ spec:
             terminationMessagePath: /dev/termination-log
             terminationMessagePolicy: File
             volumeMounts:
-            {{- if not .Values.workloadIdentity }}
-            - name: gcp-serviceaccount-credentials
-              mountPath: /etc/gcp
-              readOnly: true
-              {{- end }}
             - name: sftp-data
               mountPath: /home
           volumes:
-          {{- if not .Values.workloadIdentity }}
-          - name: gcp-serviceaccount-credentials
-            secret:
-              secretName: {{ .Values.volumes.gcsCredentials }}
-            {{- end }}
           - name: sftp-data
             persistentVolumeClaim:
               claimName: sftp-pvc

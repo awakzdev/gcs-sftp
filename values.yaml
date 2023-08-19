@@ -1,18 +1,12 @@
-# You'll have to define a username and password in a combined format
-# This snippet may be used 
-# apiVersion: v1
-# kind: Secret
-# metadata:
-#   name: sftp-secret
-# type: Opaque
-# stringData:
-#   combinedcreds: username:password
-
 environment:
   SFTP_USERS:
     secretKeyRef:
       name: sftp-secret
       key: combinedcreds
+  GCS_CREDENTIALS: # GCP Serviceaccount credentials in a JSON format. (Should only be set if WorkloadIdentity isn't)
+    secretKeyRef:
+      name: sftp-bucket-credentials
+      key: credentials.json
 
 sftp:
   schedule: 0 0 2 * * # CRONJOB Schedule - Once every month on it's second day 
@@ -26,40 +20,17 @@ cronjob:
   schedule: "0 0 * * *"
   concurrentPolicy: Forbid # Allow / Forbid / Replace
 
-# To set up Workload Identity, ensure you bind the KSA to the GSA with:
-# gcloud iam service-accounts add-iam-policy-binding \
-  # <GSA_NAME>@<PROJECT_ID>.iam.gserviceaccount.com
-  # --role roles/iam.workloadIdentityUser \
-  # --member "serviceAccount:<PROJECT_ID>.svc.id.goog[<NAMESPACE>/<KSA_NAME>]" \
-
-workloadIdentity: enabled # Please annotate the serviceAccount section incase this is set to `true`
+workloadIdentity: false # Please annotate the serviceAccount section incase this is set to `true`
 
 serviceAccount:
   create: true
   annotations: 
-    iam.gke.io/gcp-service-account: <KSA_NAME>@<PROJECT_ID>.iam.gserviceaccount.com # Incase workloadIdentity was set to true
+    iam.gke.io/gcp-service-account: gcs-serviceaccount@carwiz-97e29.iam.gserviceaccount.com # Incase workloadIdentity was set to true
   name: ""
-
-# A secret containing GCP serviceaccount with GCS permission in JSON format.
-# The following will attach the credentials as a volume to be used for authentication.
-# This snippet may be used 
-# apiVersion: v1
-# kind: Secret
-# metadata:
-#   name: sftp-bucket-credentials
-# type: Opaque
-# stringData:
-#   credentials.json: |
-#     {
-#       "type": "service_account",
-#       "project_id": "carwiz-97e29",
-#       ...
-#     }
 
 volumes:
   storage: 5Gi
   storageClassName: standard
-  gcsCredentials: sftp-bucket-credentials # Optional - Has to be set incase workloadIdentity: false
 
 image:
   repository: awakz/sftp-gcloud
