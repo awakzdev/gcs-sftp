@@ -37,8 +37,7 @@ workloadIdentity: enabled # Please annotate the serviceAccount section incase th
 serviceAccount:
   create: true
   annotations: 
-    # Incase workloadIdentity was set to true
-    iam.gke.io/gcp-service-account: <KSA_NAME>@<PROJECT_ID>.iam.gserviceaccount.com
+    iam.gke.io/gcp-service-account: <KSA_NAME>@<PROJECT_ID>.iam.gserviceaccount.com # Incase workloadIdentity was set to true
   name: ""
 
 # A secret containing GCP serviceaccount with GCS permission in JSON format.

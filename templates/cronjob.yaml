@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: {{ include "sftp.fullname" . }}-sftp-bucket-sync-cronjob
+  name: {{ include "sftp.fullname" . }}-bucket-sync-cronjob
 spec:
   concurrencyPolicy: {{ .Values.cronjob.concurrentPolicy }} 
   failedJobsHistoryLimit: 1

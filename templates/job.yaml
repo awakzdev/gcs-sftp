@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: {{ include "sftp.fullname" . }}-initial-sftp-bucket-sync-job
+  name: {{ include "sftp.fullname" . }}-initial-bucket-sync-job
 spec:
   template:
     metadata:
@@ -17,7 +17,6 @@ spec:
             {{- if not .Values.workloadIdentity }}
             gcloud auth activate-service-account --key-file /etc/gcp/*.json
             {{- end }}
-
             gsutil -m rsync -r gs://{{ .Values.sftp.bucketName }} /home/${SFTP_USERS%%:*}/
         image: {{ .Values.cronjob.image.repository }}:{{ .Values.cronjob.image.tag }}
         imagePullPolicy: {{ .Values.cronjob.image.pullPolicy }}
