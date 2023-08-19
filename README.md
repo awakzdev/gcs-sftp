@@ -47,7 +47,7 @@ gcloud iam service-accounts add-iam-policy-binding \
   --role roles/iam.workloadIdentityUser \
   --member "serviceAccount:<PROJECT_ID>.svc.id.goog[<NAMESPACE>/<KSA_NAME>]"
 ```
-Remember to replace placeholders (<..>) with actual values.
+**Remember to replace placeholders (<..>) with actual values.**
 
 4. Deploy your application. The Kubernetes Service Account used by your application will now act as the specified Google Service Account.
 
