@@ -13,10 +13,12 @@ spec:
         - /bin/bash
         - -c
         - |
-            # Authenticate && Synchronize
             {{- if not .Values.workloadIdentity }}
-            gcloud auth activate-service-account --key-file /etc/gcp/*.json
+            # Write the credentials to a temporary file
+            echo "$GCS_CREDENTIALS" > /tmp/gcs_credentials.json
+            gcloud auth activate-service-account --key-file /tmp/gcs_credentials.json
             {{- end }}
+
             gsutil -m rsync -r gs://{{ .Values.sftp.bucketName }} /home/${SFTP_USERS%%:*}/
         image: {{ .Values.cronjob.image.repository }}:{{ .Values.cronjob.image.tag }}
         imagePullPolicy: {{ .Values.cronjob.image.pullPolicy }}
