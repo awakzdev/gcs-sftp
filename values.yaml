@@ -20,12 +20,12 @@ cronjob:
   schedule: "0 0 * * *"
   concurrentPolicy: Forbid # Allow / Forbid / Replace
 
-workloadIdentity: false # Please annotate the serviceAccount section incase this is set to `true`
+workloadIdentity: enabled # Please annotate the serviceAccount section incase this is set to `true`
 
 serviceAccount:
   create: true
   annotations: 
-    iam.gke.io/gcp-service-account: gcs-serviceaccount@carwiz-97e29.iam.gserviceaccount.com # Incase workloadIdentity was set to true
+    iam.gke.io/gcp-service-account: <KSA_NAME>@<PROJECT_ID>.iam.gserviceaccount.com # Incase workloadIdentity was set to true
   name: ""
 
 volumes:
