@@ -37,11 +37,6 @@ If you're using Google Kubernetes Engine (GKE), Workload Identity allows your Ku
         iam.gke.io/gcp-service-account: <GSA_NAME>@<PROJECT_ID>.iam.gserviceaccount.com
     name: ""
     ```
-- Make sure `gcsCredentials` is set correctly. This is optional and is used when workloadIdentity is set to false.
-    ```yaml
-    volumes:
-    gcsCredentials: sftp-bucket-credentials
-    ```
 **Setting up Workload Identity:** 
 1. Make sure Workload Identity is enabled on your GKE cluster.
 2. Create the Google Service Account if it does not exist.
