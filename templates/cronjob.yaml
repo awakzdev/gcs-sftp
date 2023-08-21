@@ -46,4 +46,4 @@ spec:
           schedulerName: default-scheduler
           securityContext: {}
           terminationGracePeriodSeconds: 30
-  schedule: {{ .Values.sftp.schedule }}
+  schedule: {{ .Values.cronjob.schedule }}
