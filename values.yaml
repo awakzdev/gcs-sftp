@@ -1,17 +1,29 @@
+sftp:
+  schedule: 0 0 2 * * # CRONJOB Schedule - Once every month on it's second day 
+  bucketName: carwiz_jato # Synchronizes files from this bucket
+
+workloadIdentity: enabled # Please annotate the serviceAccount section incase this is set to `true`
+
+serviceAccount:
+  create: true
+  annotations: 
+    iam.gke.io/gcp-service-account: <GSA_NAME>@<PROJECT_ID>.iam.gserviceaccount.com # Incase workloadIdentity was set to true
+  name: ""
+  
 environment:
   SFTP_USERS:
     secretKeyRef:
       name: sftp-secret
       key: combinedcreds
-  GCS_CREDENTIALS: # GCP Serviceaccount credentials in a JSON format. (Should only be set if WorkloadIdentity isn't)
+  GCS_CREDENTIALS: # Optional - GCP Serviceaccount credentials in a JSON format. (Should only be set if WorkloadIdentity isn't)
     secretKeyRef:
       name: sftp-bucket-credentials
       key: credentials.json
 
-sftp:
-  schedule: 0 0 2 * * # CRONJOB Schedule - Once every month on it's second day 
-  bucketName: carwiz_jato # Synchronizes files from this bucket
-
+volumes:
+  storage: 5Gi
+  storageClassName: standard
+  
 cronjob:
   image:
     repository: google/cloud-sdk
@@ -19,19 +31,7 @@ cronjob:
     pullPolicy: Always
   schedule: "0 0 * * *"
   concurrentPolicy: Forbid # Allow / Forbid / Replace
-
-workloadIdentity: enabled # Please annotate the serviceAccount section incase this is set to `true`
-
-serviceAccount:
-  create: true
-  annotations: 
-    iam.gke.io/gcp-service-account: <KSA_NAME>@<PROJECT_ID>.iam.gserviceaccount.com # Incase workloadIdentity was set to true
-  name: ""
-
-volumes:
-  storage: 5Gi
-  storageClassName: standard
-
+  
 image:
   repository: awakz/sftp-gcloud
   pullPolicy: IfNotPresent
@@ -52,4 +52,3 @@ resources: {}
   #   memory: 128Mi
 
 nodeSelector: {}
-
