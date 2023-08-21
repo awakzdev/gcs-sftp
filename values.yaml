@@ -1,5 +1,4 @@
 sftp:
-  schedule: 0 0 2 * * # CRONJOB Schedule - Once every month on it's second day 
   bucketName: carwiz_jato # Synchronizes files from this bucket
 
 workloadIdentity: enabled # Please annotate the serviceAccount section incase this is set to `true`
@@ -29,7 +28,7 @@ cronjob:
     repository: google/cloud-sdk
     tag: latest
     pullPolicy: Always
-  schedule: "0 0 * * *"
+  schedule: "0 0 2 * *" # CRONJOB Schedule - Once every month on it's second day 
   concurrentPolicy: Forbid # Allow / Forbid / Replace
   
 image:
