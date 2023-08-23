@@ -1,5 +1,5 @@
 # Helm Chart for SFTP Server with Google Cloud Integration
-This repository provides a Helm chart for deploying an SFTP server that synchronizes with Google Cloud Storage. It leverages the power of gcloud and gsutil to seamlessly fetch files from a specified bucket. Once synchronized, these files are made available via SFTP..
+This repository provides a Helm chart for deploying an SFTP server that synchronizes with Google Cloud Storage. It leverages the power of gcloud and gsutil to seamlessly fetch files from a specified bucket. Once synchronized, these files are made available via SFTP.
 
 ## Table of Contents
 - [Configuration](#configuration)
