@@ -14,7 +14,7 @@ environment:
     secretKeyRef:
       name: sftp-secret
       key: combinedcreds
-  GCS_CREDENTIALS: # Optional - GCP Serviceaccount credentials in a JSON format. (Should only be set if WorkloadIdentity isn't)
+  GCS_CREDENTIALS: # Optional - GCP Serviceaccount credentials in a JSON format. (Should only be set if WorkloadIdentity is disabled)
     secretKeyRef:
       name: sftp-bucket-credentials
       key: credentials.json
