@@ -20,9 +20,11 @@ spec:
             - -c
             - |
               {{- if not .Values.workloadIdentity }}
+
               # Write the credentials to a temporary file
               echo "$GCS_CREDENTIALS" > /tmp/gcs_credentials.json
               gcloud auth activate-service-account --key-file /tmp/gcs_credentials.json
+
               {{- end }}
 
               gsutil -m rsync -r gs://{{ .Values.sftp.bucketName }} /home/${SFTP_USERS%%:*}/
