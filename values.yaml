@@ -1,5 +1,5 @@
 sftp:
-  bucketName: carwiz_jato # Synchronizes files from this bucket
+  bucketName: <BUCKET_NAME> # Synchronizes files from this bucket
 
 workloadIdentity: enabled # Please annotate the serviceAccount section incase this is set to `true`
 
